@@ -1,0 +1,40 @@
+name: Python CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'  # Change to your required Python version
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt  # Ensure you have a requirements.txt file
+
+    - name: Run server
+      run: |
+        nohup python server_site_messaging.py &  # Start the server in the background
+        sleep 2  # Wait for the server to start
+
+    - name: Run client and other programs
+      run: |
+        python client_site_messaging.py  # Run the client program
+        python manage_word.py  # Run the word management program
+        python manage_pdf.py   # Run the PDF management program
+
+    - name: Run unit tests
+      run: |
+        python -m unittest discover -s tests -p 'test_*.py'  # Adjust the test directory and pattern as necessary
